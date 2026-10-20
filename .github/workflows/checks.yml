@@ -1,10 +1,29 @@
-name: App checks
+name: App checks and Expo preview
+
 on:
   push:
+    branches: [main]
   pull_request:
+  workflow_dispatch:
+    inputs:
+      publish_preview:
+        description: Publish an Expo preview update after checks pass
+        type: boolean
+        required: false
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: app-${{ github.workflow }}-${{ github.ref }}-${{ github.event_name == 'workflow_dispatch' && 'manual' || 'checks' }}
+  cancel-in-progress: ${{ github.event_name != 'workflow_dispatch' }}
+
 jobs:
   check:
+    name: TypeScript and database tests
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -14,3 +33,39 @@ jobs:
       - run: npm ci
       - run: npx tsc --noEmit
       - run: npm test
+      - name: Check generated database setup is current
+        run: git diff --exit-code -- supabase/setup.sql
+
+  publish-preview:
+    name: Publish Expo preview
+    needs: check
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && inputs.publish_preview
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: preview
+    env:
+      CI: '1'
+      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+    steps:
+      - name: Check Expo authentication is configured
+        run: |
+          if [ -z "$EXPO_TOKEN" ]; then
+            echo '::error::Add EXPO_TOKEN as a repository or preview environment Actions secret before publishing.'
+            exit 1
+          fi
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: expo/expo-github-action@v8
+        with:
+          eas-version: 25.2.0
+          token: ${{ secrets.EXPO_TOKEN }}
+      - run: npm ci
+      - name: Publish iOS and Android preview update
+        run: eas update --channel preview --environment preview --platform all --message "GitHub Actions ${GITHUB_SHA}" --non-interactive
+      - name: Add Expo link to run summary
+        run: |
+          echo 'Preview update submitted for this commit.' >> "$GITHUB_STEP_SUMMARY"
+          echo 'https://expo.dev/accounts/tivanan_ilenard/projects/expo-go-app/updates' >> "$GITHUB_STEP_SUMMARY"

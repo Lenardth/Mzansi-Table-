@@ -57,3 +57,13 @@ npm run update:preview -- --message "Describe the update"
 ```
 
 Native preview builds use the `preview` channel. Installing an initial native build is required before EAS Update can deliver updates to that app; updates do not install a new app or change its native icon. Database migrations, hosted Auth templates, and notification worker configuration remain separate Supabase deployment steps.
+
+## GitHub Actions workflow
+
+The **App checks and Expo preview** workflow runs TypeScript, the database/notification test suite, and a generated-SQL consistency check for pushes to `main` and pull requests. These checks need no account secrets.
+
+To enable publishing, create an Expo access token for an account with access to this EAS project and save it as `EXPO_TOKEN` in GitHub → Settings → Secrets and variables → Actions (or the GitHub `preview` environment). Do not commit the token. The public Supabase connection variables are already stored in EAS's `preview` environment.
+
+In GitHub → Actions → **App checks and Expo preview** → **Run workflow**, select `main` and enable **publish_preview**. Publishing runs only after checks pass. Normal pushes and pull requests do not publish updates. The update goes to the existing Expo preview channel; a compatible native preview build is required to receive it. Native builds and Supabase migrations/template changes are separate steps.
+
+References: [Expo GitHub Action](https://github.com/expo/expo-github-action), [Expo access tokens](https://docs.expo.dev/accounts/programmatic-access/).
