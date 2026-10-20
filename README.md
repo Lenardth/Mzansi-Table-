@@ -67,3 +67,29 @@ To enable publishing, create an Expo access token for an account with access to 
 In GitHub → Actions → **App checks and Expo preview** → **Run workflow**, select `main` and enable **publish_preview**. Publishing runs only after checks pass. Normal pushes and pull requests do not publish updates. The update goes to the existing Expo preview channel; a compatible native preview build is required to receive it. Native builds and Supabase migrations/template changes are separate steps.
 
 References: [Expo GitHub Action](https://github.com/expo/expo-github-action), [Expo access tokens](https://docs.expo.dev/accounts/programmatic-access/).
+
+## EAS production build workflow
+
+`.eas/workflows/create-production-builds.yml` creates Android and iOS builds using the existing `production` build profile. It is an EAS workflow, separate from the GitHub Actions workflow, and runs when explicitly requested.
+
+Validate its definition:
+
+```sh
+npx eas-cli@latest workflow:validate .eas/workflows/create-production-builds.yml
+```
+
+Before the first production run, configure the app identifiers and signing credentials:
+
+```sh
+npx eas-cli@latest build:configure
+npx eas-cli@latest credentials:configure-build -p android -e production
+npx eas-cli@latest credentials:configure-build -p ios -e production
+```
+
+Also set the public Supabase URL and publishable key in the EAS `production` environment, as for `preview`. Then run:
+
+```sh
+npx eas-cli@latest workflow:run .eas/workflows/create-production-builds.yml
+```
+
+This workflow creates build artifacts; app-store submission is a separate step. Reference: [EAS production build workflows](https://docs.expo.dev/eas/workflows/get-started/#create-production-builds).

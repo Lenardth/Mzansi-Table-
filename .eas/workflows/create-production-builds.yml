@@ -1,0 +1,16 @@
+name: Create Production Builds
+
+jobs:
+  build_android:
+    name: Build Android production app
+    type: build
+    params:
+      platform: android
+      profile: production
+
+  build_ios:
+    name: Build iOS production app
+    type: build
+    params:
+      platform: ios
+      profile: production
