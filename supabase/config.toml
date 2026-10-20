@@ -1,0 +1,5 @@
+project_id = "expo-go-app"
+
+[functions.dispatch-booking-notifications]
+# The scheduled worker authenticates with NOTIFICATION_DISPATCH_SECRET.
+verify_jwt = false

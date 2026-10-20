@@ -1,0 +1,66 @@
+{
+  "expo": {
+    "name": "Mzansi Table",
+    "slug": "expo-go-app",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/brand/app-icon.png",
+    "scheme": "expogoapp",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "icon": "./assets/brand/app-icon.png"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#104c33",
+        "foregroundImage": "./assets/brand/adaptive-foreground.png",
+        "monochromeImage": "./assets/brand/adaptive-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "output": "server",
+      "favicon": "./assets/brand/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#104c33",
+          "image": "./assets/brand/splash-mark.png",
+          "imageWidth": 200
+        }
+      ],
+      "expo-font",
+      "expo-image",
+      "expo-status-bar",
+      "expo-web-browser",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/brand/notification-icon.png",
+          "color": "#104c33",
+          "defaultChannel": "bookings"
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true,
+      "reactCompiler": false
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "6147018a-bb96-4c50-904a-abb5cadcb2c5"
+      }
+    },
+    "owner": "tivanan_ilenard",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/6147018a-bb96-4c50-904a-abb5cadcb2c5"
+    }
+  }
+}
